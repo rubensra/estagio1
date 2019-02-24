@@ -12,6 +12,8 @@ Disparo Operacional
 - Enredo e Personagens: Uma grande ameaça está atacando os sistemas computacionais e você deve assumir o papel de um dos heróis, a fim de
 evitar que essa ameaça se espalhe e domine todos os computadores do mundo;
 
+- Personagem Principal: a nave que será controlado pelo jogador simbolizando um dos sistemas operacionais escolhidos;
+
 - Inimigos: elementos que simbolizam ameaças do mundo da computação como virus, spam entre outros;
 
 - Iteração do Jogador: movimentando a nave para desviar dos ataques inimigos enquanto atira nos mesmos para pontuar e avançar;
