@@ -16,12 +16,12 @@ local physics = require( "physics" ) -- Carregando modulo de fisica do sistema
 physics.start() -- Iniciando a fisica
 physics.setGravity( 0 , 0 ) -- Ajustando gravidade para Zero 
 
--- Criando e carregando as imagens de fundo para o efeito de movimento --
-local fundo = display.newImageRect( backGroup, "images/circuito00_320x480.png", 320, 480 )
+--[[ Criando e carregando as imagens de fundo para o efeito de movimento --
+local fundo = display.newImageRect( sceneGroup, "images/circuito00_320x480.png", 320, 480 )
 fundo.x = display.contentCenterX 
 fundo.y = display.contentCenterY
 fundo.xScale = 1.0 
-fundo.yScale = 1.0
+fundo.yScale = 1.0]]--
 
 local function gotoInicio()
 	composer.gotoScene( "inicio", { time = 800, effect="crossFade" } )
@@ -36,10 +36,21 @@ function scene:create( event )
 
 	local sceneGroup = self.view
 	-- Code here runs when the scene is first created but has not yet appeared on screen
-	local mensagemText = display.newText(uiGroup, "FIM DE JOGO!!!", display.contentCenterX, display.contentCenterY, native.systemFont, 20 )
+	-------------------------------------------------------------------------------------
+	local fundo = display.newImageRect( sceneGroup, "images/circuito00_320x480.png", 320, 480 )
+	fundo.x = display.contentCenterX 
+	fundo.y = display.contentCenterY
+	fundo.xScale = 1.0 
+	fundo.yScale = 1.0
+	-------------------------------------------------------------------------------------
+	local mensagemText = display.newText(sceneGroup, "FIM DE JOGO!!!", display.contentCenterX, display.contentCenterY, native.systemFont, 20 )
 	mensagemText.alpha = 0;
 	transition.to(mensagemText, {alpha = 1 } )
-
+	local replayButton = display.newText( sceneGroup, "Toque pra Rejogar", display.contentCenterX, display.contentCenterY + 50, native.systemFont, 20 );
+	replayButton:setFillColor( 1, 1, 1)
+	replayButton.alpha = 0;
+	transition.to( replayButton, { alpha = 1 } );
+	replayButton:addEventListener("tap", gotoInicio )
 end
 
 
@@ -54,7 +65,7 @@ function scene:show( event )
 
 	elseif ( phase == "did" ) then
 		-- Code here runs when the scene is entirely on screen
-		fundo:addEventListener( "tap", gotoInicio )
+		--fundo:addEventListener( "tap", gotoInicio )
 	end
 end
 
