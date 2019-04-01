@@ -223,6 +223,7 @@ end
 -- Funcao de disparo do Laser das Naves Aliens --
 local function fireLaserAlien( spaceship, raio )
 
+    if( vidas ~= 0 )then
         local alien = spaceship
         if raio == 1 then
             local newLaser = display.newImageRect( mainGroup, alienSheet, 1, 50, 80 )
@@ -261,6 +262,7 @@ local function fireLaserAlien( spaceship, raio )
             newLaser.yScale = 0.6
             newLaser:setLinearVelocity( 0, 350 )
         end
+    end
 end
 -------------------------------------------------------------------------------------
 
@@ -318,16 +320,18 @@ end
 -- Funcao para gerar as naves Aliens --
 local function geraAliens( event )
 
-    local opt = math.random(4,6)
-    if opt == 4 then
-        local et = function() return navesAliens( opt ) end
-        timer.performWithDelay(500, et, 3)
-    elseif opt == 5 then
-        local et = function() return navesAliens( opt ) end
-        timer.performWithDelay(500, et, 3)
-    else
-        local et = function() return navesAliens( opt ) end
-        timer.performWithDelay(800, et, 2)
+    if( vidas ~= 0 )then
+        local opt = math.random(4,6)
+        if opt == 4 then
+            local et = function() return navesAliens( opt ) end
+            timer.performWithDelay(500, et, 3)
+        elseif opt == 5 then
+            local et = function() return navesAliens( opt ) end
+            timer.performWithDelay(500, et, 3)
+        else
+            local et = function() return navesAliens( opt ) end
+            timer.performWithDelay(800, et, 2)
+        end
     end
 end
 -------------------------------------------------------------------------------------
@@ -448,9 +452,11 @@ local function colisaoHeroiAlien(obj1, obj2)
             display.remove( vida1 )
         elseif ( vidas == 0 and obj1.myName == "nave") then
             display.remove( obj1 )
+            display.remove( botao )
             timer.performWithDelay(2000, fimDeJogo)
         elseif ( vidas == 0 and obj2.myName == "nave") then
             display.remove ( obj2 )
+            display.remove( botao )
             timer.performWithDelay( 2000, fimDeJogo )
         end
 
@@ -479,9 +485,11 @@ local function colisaoHeroiLaser(obj1, obj2)
             display.remove( vida1 )
         elseif ( vidas == 0 and obj1.myName == "nave") then
             display.remove( obj1 )
+            display.remove( botao )
             timer.performWithDelay( 2000, fimDeJogo )
         elseif ( vidas == 0 and obj2.myName == "nave") then
-            display.remove ( obj2 )
+            display.remove( obj2 )
+            display.remove( botao )
             timer.performWithDelay( 2000, fimDeJogo )
             --timer.cancel(  alienLoopTimer )
             --composer.gotoScene( "fimJogo", { time=800, effect="crossFade"} )
@@ -577,7 +585,6 @@ function scene:show( event )
         Runtime:addEventListener( "enterFrame", updateFrame )
         alienLoopTimer = timer.performWithDelay(5000, geraAliens, 0)
         Runtime:addEventListener( "collision", onCollision )
-
 	end
 end
 
@@ -595,7 +602,8 @@ function scene:hide( event )
 	elseif ( phase == "did" ) then
         -- Code here runs immediately after the scene goes entirely off screen
         Runtime:removeEventListener( "enterFrame", updateFrame )
-        Runtime:removeEventListener( "collision", onCollision )        
+        Runtime:removeEventListener( "collision", onCollision )
+        Runtime:removeEventListener("tap", botao)        
         physics.pause()
         composer.removeScene( "game2" )
 
