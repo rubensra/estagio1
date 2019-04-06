@@ -27,6 +27,9 @@ local aliensTable = {} -- Tabela p/ guardar as naves aliens criadas
 
 local js -- Variavel para guardar a referencai ao JoyStick Virtual
 local nave -- Variavel para referenciar a Nave
+local chefe -- Variavel para referenciar o chefe
+local vidaChefe = 10 
+local movimento = true -- variavel para auxiliar no deslocamento do background
 
 local tipo
 local municao
@@ -43,8 +46,15 @@ local mainGroup = display.newGroup()
 local uiGroup = display.newGroup()
 
 local function fimDeJogo()
-    composer.gotoScene( "fimJogo", { time=800, effect="crossFade"} )
+
+    if( vidaChefe == 0 )then
+        composer.gotoScene( "vitoria", { time=800, effect="crossFade"} )
+    else
+        composer.gotoScene( "fimJogo", { time=800, effect="crossFade"} )
+    end
 end
+
+
 
 local physics = require( "physics" ) -- Carregando modulo de fisica do sistema
 physics.start() -- Iniciando a fisica
@@ -168,22 +178,47 @@ local alienSheetOptions =
 }
 -- Carregando a folha de imagens --
 local alienSheet = graphics.newImageSheet( "images/inimigos.png", alienSheetOptions )
--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
+local chefeSheetOptions = 
+{
+    frames = {
+        { -- Worm
+            x = 0,
+            y = 0,
+            width = 100,
+            height = 120,
+        },
+        { -- Spam
+            x = 101,
+            y = 0,
+            width = 95,
+            height = 120,
+        },
+        {
+            x = 195,
+            y = 0,
+            width = 60,
+            height = 120,
+        },
+    },
+}
+local chefeSheet = graphics.newImageSheet("images/chefe_alien.png", chefeSheetOptions)
+
+---------------------------------------------------------------------------------------
 
 -- Funcao que realiza a movimentacao do cenario de fundo
 local function move( event )
 
-    fundo.y = fundo.y + scrollSpeed
-    fundo2.y = fundo2.y + scrollSpeed
-    --if ( fun ) then
-        --local tDelta = event.time - tPrevious
+    if( movimento == true ) then
+        fundo.y = fundo.y + scrollSpeed
+        fundo2.y = fundo2.y + scrollSpeed
         if ( fundo.y - _H / 2 > _H ) then 
             fundo:translate( 0, -fundo.contentHeight * 2 )
         end
         if ( fundo2.y - _H / 2 > _H ) then
             fundo2:translate( 0, -fundo2.contentHeight * 2 )
         end
-    --end
+    end
 end
 --------------------------------------------------------------------------------------
 
@@ -334,6 +369,52 @@ local function geraAliens( event )
         end
     end
 end
+
+--------------------------------------------------------------------------------------
+local function disparoChefe( chefe )
+    if( vidas ~= 0 and vidaChefe ~= 0 )then
+        local newLaser = display.newImageRect( mainGroup, chefeSheet, 3, 60, 120 )
+        physics.addBody( newLaser, "dynamic", { isSensor=true } )
+        newLaser.isBullet = true
+        newLaser.myName = "alienlaser"
+        newLaser.x = chefe.x
+        newLaser.y = chefe.y+5
+        newLaser:toBack()
+        newLaser.xScale = 0.6
+        newLaser.yScale = 0.6
+        newLaser:setLinearVelocity( math.random(-100,100), 350 )
+    end
+end
+
+-- Funcao para carregar o chefao
+local function bigBoss( event )
+    chefe = display.newImageRect(mainGroup, chefeSheet, 1, 100, 120)
+    chefe.x = display.contentCenterX
+    chefe.y = 50
+    physics.addBody( chefe, {raidus = 10, isSensor = true } )
+    chefe.myName = "chefe"
+    chefe.xScale = 0.8
+    chefe.yScale = 0.8
+    local tiro = function() return disparoChefe(chefe) end
+    timer.performWithDelay(800, tiro, 0) 
+end
+
+local function chefeFinal( event )
+
+    timer.cancel( alienLoopTimer );
+    --movimento = false;
+    --Runtime:removeEventListener("enterFrame", updateFrame);
+    bigBoss();
+end
+
+-------------------------------------------------------------------------------------
+local function recarregar( event )
+    if ( event.isShake == true and tipo ~=2 ) then
+        municao = 10
+    end
+end
+
+
 -------------------------------------------------------------------------------------
 local function dragShip( event )
 
@@ -344,13 +425,17 @@ local function dragShip( event )
         -- Set touch focus on the ship
         display.currentStage:setFocus( ship )
         -- Store initial offset position
-		ship.touchOffsetX = event.x - ship.x
-		ship.touchOffsetY = event.y - ship.y
+        if(( event.x > 10 and event.x < display.contentWidth) and (event.y > 20 and event.y < display.contentHeight)) then
+            ship.touchOffsetX = event.x - ship.x
+            ship.touchOffsetY = event.y - ship.y
+        end
 
     elseif ( "moved" == phase ) then
         -- Move the ship to the new touch position
-		ship.x = event.x - ship.touchOffsetX
-		ship.y = event.y - ship.touchOffsetY
+        if(( event.x > 40 and event.x < display.contentWidth-40) and (event.y > 30 and event.y < display.contentHeight-30)) then
+            ship.x = event.x - ship.touchOffsetX
+            ship.y = event.y - ship.touchOffsetY
+        end
 
     elseif ( "ended" == phase or "canceled" == phase ) then
         -- Release touch focus on the ship
@@ -525,7 +610,24 @@ local function onCollision( event )
             --[[ Increase score]]--
             score = score + 100;
             scoreText.text = "Score: " .. score
-
+        elseif (obj1.myName == "laser" and obj2.myName == "chefe") then
+                display.remove(obj1);
+                vidaChefe = vidaChefe - 1
+                if(vidaChefe == 0 )then
+                    display.remove(chefe)
+                    timer.perforWithDelay(800,display.remove( botao ))
+                    timer.performWithDelay(800,display.remove( nave ))
+                    timer.performWithDelay( 2000, fimDeJogo )
+                end
+        elseif (obj1.myName == "chefe" and obj2.myName == "laser")then
+                display.remove(obj2);
+                vidaChefe = vidaChefe - 1
+                if(vidaChefe == 0 )then
+                    display.remove( chefe )
+                    display.remove( botao )
+                    display.remove( nave )
+                    timer.performWithDelay( 1000, fimDeJogo )
+                end
         elseif ( ( obj1.myName == "nave" and obj2.myName == "alien" ) or
                 ( obj1.myName == "alien" and obj2.myName == "nave" )) then 
                 colisaoHeroiAlien(obj1,obj2);
@@ -584,6 +686,8 @@ function scene:show( event )
         physics.start()
         Runtime:addEventListener( "enterFrame", updateFrame )
         alienLoopTimer = timer.performWithDelay(5000, geraAliens, 0)
+        Runtime:addEventListener( "accelerometer", recarregar );
+        chefeTimer = timer.performWithDelay(30000, chefeFinal, 1)
         Runtime:addEventListener( "collision", onCollision )
 	end
 end
@@ -598,12 +702,14 @@ function scene:hide( event )
 	if ( phase == "will" ) then
         -- Code here runs when the scene is on screen (but is about to go off screen)
         timer.cancel(  alienLoopTimer )
+        timer.cancel( chefeTimer );
 
 	elseif ( phase == "did" ) then
         -- Code here runs immediately after the scene goes entirely off screen
         Runtime:removeEventListener( "enterFrame", updateFrame )
         Runtime:removeEventListener( "collision", onCollision )
-        Runtime:removeEventListener("tap", botao)        
+        Runtime:removeEventListener("tap", botao) 
+        Runtime:removeEventListener("accelerometer", recarregar );       
         physics.pause()
         composer.removeScene( "game2" )
 

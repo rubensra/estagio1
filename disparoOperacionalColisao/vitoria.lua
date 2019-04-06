@@ -43,7 +43,7 @@ function scene:create( event )
 	fundo.xScale = 1.0 
 	fundo.yScale = 1.0
 	-------------------------------------------------------------------------------------
-	local mensagemText = display.newText(sceneGroup, "VOCE PERDEU!!!", display.contentCenterX, display.contentCenterY, native.systemFont, 20 )
+	local mensagemText = display.newText(sceneGroup, "PARABENS VOCÊ VENCEU!!!", display.contentCenterX, display.contentCenterY, native.systemFont, 20 )
 	mensagemText.alpha = 0;
 	transition.to(mensagemText, {alpha = 1 } )
 	local replayButton = display.newText( sceneGroup, "Toque pra Rejogar", display.contentCenterX, display.contentCenterY + 50, native.systemFont, 20 );
