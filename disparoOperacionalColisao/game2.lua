@@ -25,7 +25,6 @@ local died = false -- Variavel para controlar as mortes do jogador
 
 local aliensTable = {} -- Tabela p/ guardar as naves aliens criadas
 
-local js -- Variavel para guardar a referencai ao JoyStick Virtual
 local nave -- Variavel para referenciar a Nave
 local chefe -- Variavel para referenciar o chefe
 local vidaChefe = 10 
@@ -318,7 +317,7 @@ local function navesAliens( opcao )
             alien:setLinearVelocity( -140, 180 )
             --transition.to( alien, { x = -60, y = 250, time = 4000, transition = easing.inSine, onComplete = function() display.remove(alien) end } )
             local tiro = function() return fireLaserAlien(alien, 1) end
-            timer.performWithDelay(1500, tiro, 2)
+            timer.performWithDelay(1000, tiro, 2)
             
     elseif opt == 5 then
         local alien = display.newImageRect ( mainGroup, alienSheet, 5, 70, 80 )
@@ -332,7 +331,7 @@ local function navesAliens( opcao )
         alien:setLinearVelocity( 0, 100 )
         --transition.to( alien, { y = 500, time = 7000, onComplete = function() display.remove(alien) end  } )
         local tiro = function() return fireLaserAlien(alien, 2) end
-        timer.performWithDelay(2000, tiro, 2)
+        timer.performWithDelay(1000, tiro, 2)
 
     else
         local alien = display.newImageRect ( mainGroup, alienSheet, 6, 70, 80 )
@@ -374,7 +373,7 @@ end
 local function disparoChefe( chefe )
     if( vidas ~= 0 and vidaChefe ~= 0 )then
         local newLaser = display.newImageRect( mainGroup, chefeSheet, 3, 60, 120 )
-        physics.addBody( newLaser, "dynamic", { isSensor=true } )
+        physics.addBody( newLaser, "dynamic", { radius = 10, isSensor=true } )
         newLaser.isBullet = true
         newLaser.myName = "alienlaser"
         newLaser.x = chefe.x
