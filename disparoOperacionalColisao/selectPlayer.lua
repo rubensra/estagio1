@@ -17,6 +17,13 @@ local function irSelecao3()
 	local nave = {nome="pinguim"}
 	composer.gotoScene(  "game2", { time=800, effect="crossFade", params=nave } )
 end
+
+local musicaFundo = audio.loadSound("audio/tema.mp3")
+
+local function onClose( event )
+    audio.stop();
+end
+
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
@@ -133,7 +140,7 @@ function scene:show( event )
 
 	elseif ( phase == "did" ) then
 		-- Code here runs when the scene is entirely on screen
-
+        audio.play(musicaFundo, { loops = -1 } )
 	end
 end
 
@@ -146,7 +153,7 @@ function scene:hide( event )
 
 	if ( phase == "will" ) then
 		-- Code here runs when the scene is on screen (but is about to go off screen)
-
+        onClose();
 	elseif ( phase == "did" ) then
 		-- Code here runs immediately after the scene goes entirely off screen
 

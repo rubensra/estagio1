@@ -12,6 +12,13 @@ local function gotoSelect()
 	composer.gotoScene( "selectPlayer", { time=800, effect="crossFade" } )
 end
 
+local musicaFundo = audio.loadSound("audio/tema.mp3")
+
+local function onClose( event )
+    audio.stop();
+end
+
+
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
@@ -32,6 +39,7 @@ function scene:create( event )
 	local areaToque = display.newRect( mainGroup, display.contentCenterX, display.contentCenterY+180, 320, 150 )
 	areaToque.alpha = 0.1
 	areaToque:addEventListener( "tap", gotoSelect )
+	
 end
 
 
@@ -46,7 +54,7 @@ function scene:show( event )
 
 	elseif ( phase == "did" ) then
 		-- Code here runs when the scene is entirely on screen
-
+		audio.play(musicaFundo, { loops = -1 } )
 	end
 end
 
@@ -59,7 +67,7 @@ function scene:hide( event )
 
 	if ( phase == "will" ) then
 		-- Code here runs when the scene is on screen (but is about to go off screen)
-
+		onClose();
 	elseif ( phase == "did" ) then
 		-- Code here runs immediately after the scene goes entirely off screen
 

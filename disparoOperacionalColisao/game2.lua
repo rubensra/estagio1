@@ -25,6 +25,7 @@ local died = false -- Variavel para controlar as mortes do jogador
 
 local aliensTable = {} -- Tabela p/ guardar as naves aliens criadas
 
+local js -- Variavel para guardar a referencai ao JoyStick Virtual
 local nave -- Variavel para referenciar a Nave
 local chefe -- Variavel para referenciar o chefe
 local vidaChefe = 10 
@@ -54,6 +55,19 @@ local function fimDeJogo()
 end
 
 
+local function gotoFase2(parametros)
+    local parametros = parametros;
+    composer.gotoScene( "fase2", { time = 800, effect = "crossFade", params = parametros } )
+end
+
+-- AUDIO --------------------------------------------------------------------
+local musicaFundo = audio.loadSound("audio/fasePrincipal.mp3")
+
+local function onClose( event )
+    audio.stop();
+end
+
+-------------------------------------------------------------------------------
 
 local physics = require( "physics" ) -- Carregando modulo de fisica do sistema
 physics.start() -- Iniciando a fisica
@@ -251,6 +265,8 @@ local function fireLaser( spaceship )
     if( municao ~= 99 ) then
         municao = municao - 1;
     end
+
+    return true
 end
 -------------------------------------------------------------------------------------
 
@@ -317,7 +333,7 @@ local function navesAliens( opcao )
             alien:setLinearVelocity( -140, 180 )
             --transition.to( alien, { x = -60, y = 250, time = 4000, transition = easing.inSine, onComplete = function() display.remove(alien) end } )
             local tiro = function() return fireLaserAlien(alien, 1) end
-            timer.performWithDelay(1000, tiro, 2)
+            timer.performWithDelay(1500, tiro, 2)
             
     elseif opt == 5 then
         local alien = display.newImageRect ( mainGroup, alienSheet, 5, 70, 80 )
@@ -331,7 +347,7 @@ local function navesAliens( opcao )
         alien:setLinearVelocity( 0, 100 )
         --transition.to( alien, { y = 500, time = 7000, onComplete = function() display.remove(alien) end  } )
         local tiro = function() return fireLaserAlien(alien, 2) end
-        timer.performWithDelay(1000, tiro, 2)
+        timer.performWithDelay(2000, tiro, 2)
 
     else
         local alien = display.newImageRect ( mainGroup, alienSheet, 6, 70, 80 )
@@ -373,7 +389,7 @@ end
 local function disparoChefe( chefe )
     if( vidas ~= 0 and vidaChefe ~= 0 )then
         local newLaser = display.newImageRect( mainGroup, chefeSheet, 3, 60, 120 )
-        physics.addBody( newLaser, "dynamic", { radius = 10, isSensor=true } )
+        physics.addBody( newLaser, "dynamic", { isSensor=true } )
         newLaser.isBullet = true
         newLaser.myName = "alienlaser"
         newLaser.x = chefe.x
@@ -381,7 +397,8 @@ local function disparoChefe( chefe )
         newLaser:toBack()
         newLaser.xScale = 0.6
         newLaser.yScale = 0.6
-        newLaser:setLinearVelocity( math.random(-100,100), 350 )
+        --newLaser:setLinearVelocity( math.random(-100,100), 350 )
+        transition.to(newLaser, { x = math.random(-100,330), y = 490, time = 1000, onComplete = function() display.remove(newLaser) end } )
     end
 end
 
@@ -401,8 +418,6 @@ end
 local function chefeFinal( event )
 
     timer.cancel( alienLoopTimer );
-    --movimento = false;
-    --Runtime:removeEventListener("enterFrame", updateFrame);
     bigBoss();
 end
 
@@ -474,7 +489,8 @@ local function geraNave( spaceship )
 	end
     --nave = display.newImageRect( mainGroup, naveSheet, selecao, 70, 80 )
     nave.x = display.contentCenterX
-    nave.y = display.contentHeight - 50
+    --nave.y = display.contentHeight - 50
+    nave.y = display.contentCenterY
     nave.xScale = 0.8
     nave.yScale = 0.8
     physics.addBody( nave, {radius = 10, isSensor=true} )
@@ -496,10 +512,10 @@ end
 
 
 local botao = display.newCircle( _W - 50, _H - 40, 15)
-botao.alpha = 0.5
+botao.alpha = 1
 botao:setFillColor( 1, 0, 0 )
-local disparar = function() return fireLaser(nave) end
-botao:addEventListener("tap", disparar )
+local disparar = function(event) if (event.phase == "began" )then display.getCurrentStage():setFocus(event.target, event.id ) return fireLaser(nave) end if event.pahse == "ended" or event.phase == "canceled" then display.getCurrentStage():setFocus(event.target, nil ) end end
+botao:addEventListener("touch", disparar )
 
 
 --##### Deteccao de Colisao ####
@@ -507,6 +523,7 @@ botao:addEventListener("tap", disparar )
 local function restoreShip()
 
     nave.isBodyActive = false
+    botao.isBodyActive = false
     nave.x = display.contentCenterX
     nave.y = display.contentHeight - 50
 
@@ -515,14 +532,14 @@ local function restoreShip()
     transition.to( nave, { alpha=1, time=3000,
         onComplete = function()
             nave.isBodyActive = true
-            botao.isBodyActive = true
+           -- botao.isBodyActive = true
             died = false
         end
     } )
     if (tipo ~= 2) then
         municao = 10
     end
-    transition.to( botao, { alpha = 1, time = 3000 } )
+    transition.to( botao, { alpha = 1, time = 3000, onComplete = function() botao.isBodyActive = true end } )
 end
 
 local function colisaoHeroiAlien(obj1, obj2)
@@ -575,8 +592,6 @@ local function colisaoHeroiLaser(obj1, obj2)
             display.remove( obj2 )
             display.remove( botao )
             timer.performWithDelay( 2000, fimDeJogo )
-            --timer.cancel(  alienLoopTimer )
-            --composer.gotoScene( "fimJogo", { time=800, effect="crossFade"} )
         end
 
         if (obj1.myName == "alienlaser" )then
@@ -589,6 +604,21 @@ local function colisaoHeroiLaser(obj1, obj2)
     timer.performWithDelay( 1000, restoreShip );
     end
 end
+
+local function proximaFase()
+
+    display.remove(botao)
+    local parametros = { tipoNave = tipo , totalVidas = vidas, totalScore = score, totalMunicao = municao }
+    transition.to( nave, { y = -50, time = 3000, onComplete = function() gotoFase2(parametros) end } )
+
+end
+
+local function posicaoVitoria(spaceship)
+
+    transition.moveTo(spaceship, { x = display.contentCenterX, y = display.contentHeight - 50, time = 2000, onComplete = function() proximaFase() end } )
+
+end
+
 local function onCollision( event )
     local pontos
     if ( event.phase == "began" ) then
@@ -614,18 +644,20 @@ local function onCollision( event )
                 vidaChefe = vidaChefe - 1
                 if(vidaChefe == 0 )then
                     display.remove(chefe)
-                    timer.perforWithDelay(800,display.remove( botao ))
-                    timer.performWithDelay(800,display.remove( nave ))
-                    timer.performWithDelay( 2000, fimDeJogo )
+                    --timer.perforWithDelay(800,display.remove( botao ))
+                    --timer.performWithDelay(800,display.remove( nave ))
+                    posicaoVitoria(nave);
+                    --timer.performWithDelay( 2000, fimDeJogo )
                 end
         elseif (obj1.myName == "chefe" and obj2.myName == "laser")then
                 display.remove(obj2);
                 vidaChefe = vidaChefe - 1
                 if(vidaChefe == 0 )then
                     display.remove( chefe )
-                    display.remove( botao )
-                    display.remove( nave )
-                    timer.performWithDelay( 1000, fimDeJogo )
+                    --display.remove( botao )
+                    --display.remove( nave )
+                    posicaoVitoria(nave);                
+                    --timer.performWithDelay( 1000, fimDeJogo )
                 end
         elseif ( ( obj1.myName == "nave" and obj2.myName == "alien" ) or
                 ( obj1.myName == "alien" and obj2.myName == "nave" )) then 
@@ -637,17 +669,12 @@ local function onCollision( event )
     end
 end
 
---Runtime:addEventListener( "collision", onCollision )
-
 --#############################
 
 
 
 local function updateFrame()
     move()
-    --Runtime:addEventListener( "collision", onCollision )
-   -- updatePlayerPos()
-    --updateJoystickPos()
 end
 
 -- -----------------------------------------------------------------------------------
@@ -664,7 +691,8 @@ function scene:create( event )
 	sceneGroup:insert(mainGroup);
     sceneGroup:insert(uiGroup);
     scoreText = display.newText( uiGroup, "Score: " .. score, display.contentCenterX, 20, native.systemFont, 25 )
-	local parametro = event.params
+    local parametro = event.params
+    print("Municao: " .. score )
     geraNave(parametro.nome)
     
 
@@ -688,6 +716,7 @@ function scene:show( event )
         Runtime:addEventListener( "accelerometer", recarregar );
         chefeTimer = timer.performWithDelay(30000, chefeFinal, 1)
         Runtime:addEventListener( "collision", onCollision )
+        audio.play(musicaFundo, { loops = -1 } )
 	end
 end
 
@@ -707,8 +736,9 @@ function scene:hide( event )
         -- Code here runs immediately after the scene goes entirely off screen
         Runtime:removeEventListener( "enterFrame", updateFrame )
         Runtime:removeEventListener( "collision", onCollision )
-        Runtime:removeEventListener("tap", botao) 
+        Runtime:removeEventListener("touch", botao) 
         Runtime:removeEventListener("accelerometer", recarregar );       
+        onClose()
         physics.pause()
         composer.removeScene( "game2" )
 
