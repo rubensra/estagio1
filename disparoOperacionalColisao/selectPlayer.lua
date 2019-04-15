@@ -140,7 +140,7 @@ function scene:show( event )
 
 	elseif ( phase == "did" ) then
 		-- Code here runs when the scene is entirely on screen
-        audio.play(musicaFundo, { loops = -1 } )
+        audio.play(musicaFundo, { channel = 1, loops = -1 } )
 	end
 end
 

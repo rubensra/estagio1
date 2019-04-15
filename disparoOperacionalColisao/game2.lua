@@ -508,7 +508,7 @@ end
 local botao = display.newCircle( _W - 50, _H - 40, 15)
 botao.alpha = 1
 botao:setFillColor( 1, 0, 0 )
-local disparar = function(event) if (event.phase == "began" )then display.getCurrentStage():setFocus(event.target, event.id ) return fireLaser(nave) end if event.pahse == "ended" then  audio.play(disparoHeroi, { channel = 1, loops = 1 } ) elseif event.phase == "canceled" then display.getCurrentStage():setFocus(event.target, nil ) end end
+local disparar = function(event) if (event.phase == "began" )then display.getCurrentStage():setFocus(event.target, event.id ) return fireLaser(nave) end if event.pahse == "ended" then  audio.play(disparoHeroi, { channel = 2, loops = 1 } ) elseif event.phase == "canceled" then display.getCurrentStage():setFocus(event.target, nil ) end end
 botao:addEventListener("touch", disparar )
 
 
@@ -710,7 +710,7 @@ function scene:show( event )
         Runtime:addEventListener( "accelerometer", recarregar );
         chefeTimer = timer.performWithDelay(30000, chefeFinal, 1)
         Runtime:addEventListener( "collision", onCollision )
-        audio.play(musicaFundo, { loops = -1 } )
+        audio.play(musicaFundo, { channel = 1, loops = -1 } )
 	end
 end
 

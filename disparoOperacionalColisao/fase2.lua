@@ -292,7 +292,7 @@ end
 			newLaser:toBack()
 			newLaser.yScale = 0.3
 			--newLaser:toBack()
-            audio.play(disparoHeroi, { channel = 1, loops = 1 } )
+            audio.play(disparoHeroi, { channel = 2, loops = 1 } )
 			transition.to( newLaser, { y=-30, time=500,
 				onComplete = function() display.remove( newLaser ) end
             } )
