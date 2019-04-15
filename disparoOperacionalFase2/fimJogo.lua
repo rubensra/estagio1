@@ -27,6 +27,8 @@ local function gotoInicio()
 	composer.gotoScene( "inicio", { time = 800, effect="crossFade" } )
 end
 
+local fimDeJogo = audio.loadSound("audio/fimDeJogo.mp3")
+
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
@@ -46,6 +48,7 @@ function scene:create( event )
 	local mensagemText = display.newText(sceneGroup, "VOCE PERDEU!!!", display.contentCenterX, display.contentCenterY, native.systemFont, 20 )
 	mensagemText.alpha = 0;
 	transition.to(mensagemText, {alpha = 1 } )
+	audio.play(fimDeJogo, { channel = 1, loops = 1 } )
 	local replayButton = display.newText( sceneGroup, "Toque pra Rejogar", display.contentCenterX, display.contentCenterY + 50, native.systemFont, 20 );
 	replayButton:setFillColor( 1, 1, 1)
 	replayButton.alpha = 0;

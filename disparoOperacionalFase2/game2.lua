@@ -67,6 +67,8 @@ local function onClose( event )
     audio.stop();
 end
 
+local disparoHeroi = audio.loadSound("audio/heroiLaser.mp3")
+
 -------------------------------------------------------------------------------
 
 local physics = require( "physics" ) -- Carregando modulo de fisica do sistema
@@ -257,7 +259,7 @@ local function fireLaser( spaceship )
         newLaser:toBack()
         newLaser.yScale = 0.3
         --newLaser:toBack()
-
+        audio.play(disparoHeroi, { channel = 1, loops = 1 } )
         transition.to( newLaser, { y=-30, time=500,
             onComplete = function() display.remove( newLaser ) end
         } )
