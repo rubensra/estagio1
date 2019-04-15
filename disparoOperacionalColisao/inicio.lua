@@ -12,7 +12,7 @@ local function gotoSelect()
 	composer.gotoScene( "selectPlayer", { time=800, effect="crossFade" } )
 end
 
-local musicaFundo = audio.loadSound("audio/tema.mp3")
+local musicaFundo = audio.loadSound("audio/Intro_Tema.mp3")
 
 local function onClose( event )
     audio.stop();
@@ -54,7 +54,7 @@ function scene:show( event )
 
 	elseif ( phase == "did" ) then
 		-- Code here runs when the scene is entirely on screen
-		audio.play(musicaFundo, { loops = -1 } )
+		audio.play(musicaFundo, { channel = 5, loops = -1 } )
 	end
 end
 

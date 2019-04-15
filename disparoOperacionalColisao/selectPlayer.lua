@@ -14,11 +14,11 @@ local function irSelecao2()
 end
 
 local function irSelecao3()
-	local nave = {nome="pinguim"}
-	composer.gotoScene(  "game2", { time=800, effect="crossFade", params=nave } )
+	local nave = { tipoNave = "pinguim" , totalVidas = 2, totalScore = 0, totalMunicao = 10 }--{nome="pinguim"}
+	composer.gotoScene(  "fase2", { time=800, effect="crossFade", params=nave } )
 end
 
-local musicaFundo = audio.loadSound("audio/tema.mp3")
+local musicaFundo = audio.loadSound("audio/Intro_Tema.mp3")
 
 local function onClose( event )
     audio.stop();

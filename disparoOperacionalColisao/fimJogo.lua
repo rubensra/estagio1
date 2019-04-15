@@ -27,6 +27,8 @@ local function gotoInicio()
 	composer.gotoScene( "inicio", { time = 800, effect="crossFade" } )
 end
 
+local fimDeJogo = audio.loadSound("audio/fimDeJogo.mp3")
+
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
@@ -66,6 +68,7 @@ function scene:show( event )
 	elseif ( phase == "did" ) then
 		-- Code here runs when the scene is entirely on screen
 		--fundo:addEventListener( "tap", gotoInicio )
+		audio.play(fimDeJogo, { channel = 1, loops = 1 } )
 	end
 end
 

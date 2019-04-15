@@ -61,11 +61,13 @@ local function gotoFase2(parametros)
 end
 
 -- AUDIO --------------------------------------------------------------------
-local musicaFundo = audio.loadSound("audio/fasePrincipal.mp3")
+local musicaFundo = audio.loadSound("audio/fase_Principal.mp3")
 
 local function onClose( event )
     audio.stop();
 end
+
+local disparoHeroi = audio.loadSound("audio/heroiLaser.mp3")
 
 -------------------------------------------------------------------------------
 
@@ -257,7 +259,6 @@ local function fireLaser( spaceship )
         newLaser:toBack()
         newLaser.yScale = 0.3
         --newLaser:toBack()
-
         transition.to( newLaser, { y=-30, time=500,
             onComplete = function() display.remove( newLaser ) end
         } )
@@ -471,25 +472,16 @@ local function geraNave( spaceship )
 		nave = display.newImageRect( mainGroup, naveSheet, 2, 70, 80 )
         tipo = 2
         municao = 99
-        nave.isBodyActive = true
-        vida1 = display.newImageRect( uiGroup, naveSheet, 2, 70, 80 )
-        vida2 = display.newImageRect( uiGroup, naveSheet, 2, 70, 80 )
 	elseif (spaceship == "maca") then
 		nave = display.newImageRect( mainGroup, naveSheet, 3, 70, 80 )
         tipo=3
         municao = 10
-        vida1 = display.newImageRect( uiGroup, naveSheet, 3, 70, 80 )
-        vida2 = display.newImageRect( uiGroup, naveSheet, 3, 70, 80 )
 	else
 		nave = display.newImageRect( mainGroup, naveSheet, 1, 70, 80 )
         tipo=1
         municao = 10
-        vida1 = display.newImageRect( uiGroup, naveSheet, 1, 70, 80 )
-        vida2 = display.newImageRect( uiGroup, naveSheet, 1, 70, 80 )
 	end
-    --nave = display.newImageRect( mainGroup, naveSheet, selecao, 70, 80 )
     nave.x = display.contentCenterX
-    --nave.y = display.contentHeight - 50
     nave.y = display.contentCenterY
     nave.xScale = 0.8
     nave.yScale = 0.8
@@ -497,12 +489,14 @@ local function geraNave( spaceship )
     local tiro = function() return fireLaser(nave) end
     nave.myName = "nave"
     
+    vida1 = display.newImageRect( uiGroup, naveSheet, tipo, 70, 80 )
+    vida2 = display.newImageRect( uiGroup, naveSheet, tipo, 70, 80 )
     vida1.x = display.contentCenterX - 120
-    vida1.y = display.contentHeight - 20
+    vida1.y = 20
     vida1.xScale = 0.2
     vida1.yScale = 0.2
     vida2.x = display.contentCenterX - 90
-    vida2.y = display.contentHeight - 20
+    vida2.y = 20
     vida2.xScale = 0.2
     vida2.yScale = 0.2 
 	--nave.imagem:addEventListener( "tap", tiro );
@@ -514,7 +508,7 @@ end
 local botao = display.newCircle( _W - 50, _H - 40, 15)
 botao.alpha = 1
 botao:setFillColor( 1, 0, 0 )
-local disparar = function(event) if (event.phase == "began" )then display.getCurrentStage():setFocus(event.target, event.id ) return fireLaser(nave) end if event.pahse == "ended" or event.phase == "canceled" then display.getCurrentStage():setFocus(event.target, nil ) end end
+local disparar = function(event) if (event.phase == "began" )then display.getCurrentStage():setFocus(event.target, event.id ) return fireLaser(nave) end if event.pahse == "ended" then  audio.play(disparoHeroi, { channel = 1, loops = 1 } ) elseif event.phase == "canceled" then display.getCurrentStage():setFocus(event.target, nil ) end end
 botao:addEventListener("touch", disparar )
 
 
@@ -609,7 +603,7 @@ local function proximaFase()
 
     display.remove(botao)
     local parametros = { tipoNave = tipo , totalVidas = vidas, totalScore = score, totalMunicao = municao }
-    transition.to( nave, { y = -50, time = 3000, onComplete = function() gotoFase2(parametros) end } )
+    transition.to( nave, { y = -50, time = 3000, transition=easing.inQuad, onComplete = function() gotoFase2(parametros) end } )
 
 end
 
