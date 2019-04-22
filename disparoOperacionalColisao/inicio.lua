@@ -12,7 +12,7 @@ local function gotoSelect()
 	composer.gotoScene( "selectPlayer", { time=800, effect="crossFade" } )
 end
 
-local musicaFundo = audio.loadSound("audio/Intro_Tema.mp3")
+local musicaFundo = audio.loadSound("audio/Intro_Tema.wav")
 
 local function onClose( event )
     audio.stop();

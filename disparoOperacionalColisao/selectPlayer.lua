@@ -18,7 +18,7 @@ local function irSelecao3()
 	composer.gotoScene(  "fase2", { time=800, effect="crossFade", params=nave } )
 end
 
-local musicaFundo = audio.loadSound("audio/Intro_Tema.mp3")
+local musicaFundo = audio.loadSound("audio/Intro_Tema.wav")
 
 local function onClose( event )
     audio.stop();

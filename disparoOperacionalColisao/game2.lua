@@ -61,13 +61,13 @@ local function gotoFase2(parametros)
 end
 
 -- AUDIO --------------------------------------------------------------------
-local musicaFundo = audio.loadSound("audio/fase_Principal.mp3")
+local musicaFundo = audio.loadSound("audio/fase_principal.wav")
 
 local function onClose( event )
     audio.stop();
 end
 
-local disparoHeroi = audio.loadSound("audio/heroiLaser.mp3")
+local disparoHeroi = audio.loadSound("audio/heroiLaser.wav")
 
 -------------------------------------------------------------------------------
 

@@ -16,12 +16,15 @@ local physics = require( "physics" ) -- Carregando modulo de fisica do sistema
 physics.start() -- Iniciando a fisica
 physics.setGravity( 0 , 0 ) -- Ajustando gravidade para Zero 
 
---[[ Criando e carregando as imagens de fundo para o efeito de movimento --
-local fundo = display.newImageRect( sceneGroup, "images/circuito00_320x480.png", 320, 480 )
-fundo.x = display.contentCenterX 
-fundo.y = display.contentCenterY
-fundo.xScale = 1.0 
-fundo.yScale = 1.0]]--
+-- AUDIO ---------------------------------------------------------------------
+
+local musicaFundo = audio.loadSound("audio/fim_tema.wav")
+
+local function onClose( event )
+    audio.stop();
+end
+
+-------------------------------------------------------------------------------
 
 local function gotoInicio()
 	composer.gotoScene( "inicio", { time = 800, effect="crossFade" } )
@@ -64,6 +67,7 @@ function scene:show( event )
 		-- Code here runs when the scene is still off screen (but is about to come on screen)
 
 	elseif ( phase == "did" ) then
+		audio.play(musicaFundo, {channel = 1, loops = -1 } )
 		-- Code here runs when the scene is entirely on screen
 		--fundo:addEventListener( "tap", gotoInicio )
 	end
@@ -78,7 +82,7 @@ function scene:hide( event )
 
 	if ( phase == "will" ) then
 		-- Code here runs when the scene is on screen (but is about to go off screen)
-		
+		onClose();
 
 	elseif ( phase == "did" ) then
 		-- Code here runs immediately after the scene goes entirely off screen

@@ -16,18 +16,11 @@ local physics = require( "physics" ) -- Carregando modulo de fisica do sistema
 physics.start() -- Iniciando a fisica
 physics.setGravity( 0 , 0 ) -- Ajustando gravidade para Zero 
 
---[[ Criando e carregando as imagens de fundo para o efeito de movimento --
-local fundo = display.newImageRect( sceneGroup, "images/circuito00_320x480.png", 320, 480 )
-fundo.x = display.contentCenterX 
-fundo.y = display.contentCenterY
-fundo.xScale = 1.0 
-fundo.yScale = 1.0]]--
-
 local function gotoInicio()
 	composer.gotoScene( "inicio", { time = 800, effect="crossFade" } )
 end
 
-local fimDeJogo = audio.loadSound("audio/fimDeJogo.mp3")
+local fimDeJogo = audio.loadSound("audio/Game_Over.wav")
 
 -- -----------------------------------------------------------------------------------
 -- Scene event functions

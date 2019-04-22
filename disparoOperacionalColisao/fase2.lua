@@ -18,12 +18,12 @@ local died = false -- Variavel para controlar as mortes do jogador
 
 local inimigoTable = {} -- Tabela p/ guardar as naves aliens criadas
 
-local interpolacaoTable = {"transition=easing.countinousLoop", "transition=easing.inQuart", "transition=easing.outQuart", "transition=easing.inOutQuart", "transition=easing.outInBack" }
+--local interpolacaoTable = {"transition=easing.countinousLoop", "transition=easing.inQuart", "transition=easing.outQuart", "transition=easing.inOutQuart", "transition=easing.outInBack" }
 
 local js -- Variavel para guardar a referencai ao JoyStick Virtual
 local nave -- Variavel para referenciar a Nave
 local chefe -- Variavel para referenciar o chefe
-local vidaChefe = 10 
+local vidaChefe = 20 
 local movimento = true -- variavel para auxiliar no deslocamento do background
 
 local tempo = 0
@@ -41,6 +41,7 @@ local backGroup = display.newGroup()
 local mainGroup = display.newGroup()
 local uiGroup = display.newGroup()
 
+local atkChefeLoopTimer
 local function fimDeJogo()
 
     if( vidaChefe == 0 )then
@@ -56,18 +57,22 @@ local function gotoFase2()
 end
 ]]--
 -- AUDIO --------------------------------------------------------------------
-local musicaFundo = audio.loadSound("audio/Tema_2aFase.mp3")
+
+local musicaFundo = audio.loadSound("audio/Tema_2aFase.wav")
+local morteChefe = audio.loadSound("audio/morteChefe.wav")
+local musicaChefe = audio.loadSound("audio/musicaChefe.wav")
 
 local function onClose( event )
     audio.stop();
 end
 
-local disparoHeroi = audio.loadSound("audio/heroiLaser.mp3")
+local disparoHeroi = audio.loadSound("audio/heroiLaser.wav")
 -------------------------------------------------------------------------------
 
 local physics = require( "physics" ) -- Carregando modulo de fisica do sistema
 physics.start() -- Iniciando a fisica
 physics.setGravity( 0 , 0 ) -- Ajustando gravidade para Zero 
+physics.setDrawMode( "hybrid" )
 
 -- Criando e carregando as imagens de fundo para o efeito de movimento --
 --local fundo = display.newImage( backGroup, "images/fase2-1920x1280.png", 320, 480 )
@@ -192,11 +197,11 @@ local inimigoSheet = graphics.newImageSheet( "images/inimigosFase2.png", inimigo
 ---------------------------------------------------------------------------------------------
 local function fireLaserAlien( spaceship, raio )
 
-    if( vidas ~= 0 )then
+    if( vidas ~= 0 and spaceship )then
         local inimigo = spaceship
     
         local newLaser = display.newImageRect( mainGroup, inimigoSheet, raio+4, 100, 200 )
-        physics.addBody( newLaser, "dynamic", { radius = 4, isSensor=true } )
+        physics.addBody( newLaser, "dynamic", { radius = 6, isSensor=true } )
         newLaser.isBullet = true
         newLaser.myName = "inimigolaser"
 
@@ -210,19 +215,33 @@ local function fireLaserAlien( spaceship, raio )
     end
 end
 
+--------------------------------------------------------------------------------------------
+
+-- Remove os Inimigos -------------------
+
+local function removeInimigo(inimigo)
+
+    for i = #inimigoTable, 1, -1 do
+        if ( inimigoTable[i] == inimigo ) then
+            table.remove( inimigoTable, i)
+            break
+        end
+    end
+end
+
 -----------------------------------------------------------------------------------------------------------------
 local function ataqueInimigo(inimigo, opt)
 
     local atk = math.random(5)
 
     if ( inimigo.x <1 and inimigo.y < display.contentCenterY / 2 ) then
-        transition.to( inimigo, {x = 340,  y = display.contentCenterY, time = 7000, transition=easing.inOutQuart, onComplete = function() display.remove(inimigo) end } )
+        transition.to( inimigo, {x = 340,  y = display.contentCenterY, time = 7000, transition=easing.inOutQuart, onComplete = function() removeInimigo(inimigo) end } )
         --print("inOutQuart")
     elseif( inimigo.y < 1 ) then
-        transition.to( inimigo, {y = display.contentHeight + 200, time = 10000, onComplete = function() display.remove(inimigo) end } )
+        transition.to( inimigo, {y = display.contentHeight + 200, time = 10000, onComplete = function() removeInimigo(inimigo) end } )
         --print("inOutBack")
     else
-        transition.to( inimigo, {x = -100,  y = display.contentCenterY + 200, time = 4000, transition=easing.outInBack, onComplete = function() display.remove(inimigo) end } )
+        transition.to( inimigo, {x = -100,  y = display.contentCenterY + 200, time = 4000, transition=easing.outInBack, onComplete = function() removeInimigo(inimigo) end } )
         --print("outInBack")
     end
     if(opt == 1 or opt == 2) then
@@ -237,7 +256,7 @@ end
 local function navesAliens( opcao )
 
     local opt = opcao
-    local inimigo = display.newImageRect ( mainGroup, inimigoSheet, opt, 200, 200 )
+    local inimigo = display.newImageRect ( mainGroup, inimigoSheet, opt, 50, 60 )
     table.insert(inimigoTable, inimigo)
     local posicao = math.random(1,3)
     if (posicao == 1) then
@@ -250,9 +269,9 @@ local function navesAliens( opcao )
         inimigo.x = math.random(320,350)
         inimigo.y = math.random(0, display.contentCenterY)
     end
-    physics.addBody( inimigo,{ raidus = 2, isSensor = true } )
-    inimigo.xScale = 0.4
-    inimigo.yScale = 0.4
+    physics.addBody( inimigo,{ radius = 15, isSensor = true } )
+    --inimigo.xScale = 0.4
+    --inimigo.yScale = 0.4
     inimigo.myName = "inimigo"
     ataqueInimigo(inimigo,opt)
     --inimigo:setLinearVelocity( -140, 180 )
@@ -283,7 +302,7 @@ end
 			else newLaser = display.newImageRect( mainGroup, naveSheet, 4, 15, 80 )
 			end
 			--newLaser = display.newImageRect( mainGroup, naveSheet, nave.tipo+3, 15, 80 )
-			physics.addBody( newLaser, "dynamic", { radius = 3, isSensor=true } )
+			physics.addBody( newLaser, "dynamic", { radius = 5, isSensor=true } )
 			newLaser.isBullet = true
 			newLaser.myName = "laser"
 	
@@ -292,7 +311,7 @@ end
 			newLaser:toBack()
 			newLaser.yScale = 0.3
 			--newLaser:toBack()
-            audio.play(disparoHeroi, { channel = 2, loops = 1 } )
+            audio.play(disparoHeroi, { channel = 2 } )
 			transition.to( newLaser, { y=-30, time=500,
 				onComplete = function() display.remove( newLaser ) end
             } )
@@ -367,16 +386,6 @@ local function restoreShip()
     --transition.to( botao, { alpha = 1, time = 3000, onComplete = function() botao.isBodyActive = true end } )
 end
 
-local function move()
-
-	transition.to(fundo, { y = 800, time = 60000})
-
-end
-
-local function updateFrame()
-    move()
-end
-
 local function geraNave(tipo,vidas)
 
 	local selecao
@@ -389,7 +398,7 @@ local function geraNave(tipo,vidas)
     nave.y = display.contentHeight + 100 
     nave.xScale = 0.8
     nave.yScale = 0.8
-    physics.addBody( nave, {radius = 10, isSensor=true} )
+    physics.addBody( nave, {radius = 15, isSensor=true} )
     local tiro = function() return fireLaser(nave,tipo) end
     nave.myName = "nave"
     
@@ -418,7 +427,8 @@ end
 local botao = display.newCircle(mainGroup, _W - 50, _H - 40, 15)
 botao.alpha = 1
 botao:setFillColor( 1, 0, 0 )
-local disparar = function(event) if (event.phase == "began" )then display.getCurrentStage():setFocus(event.target, event.id ) return fireLaser(nave,tipo) end if event.pahse == "ended" or event.phase == "canceled" then display.getCurrentStage():setFocus(event.target, nil ) end end
+local disparar = function(event) if (event.phase == "began" )then display.getCurrentStage():setFocus(event.target, event.id ) return fireLaser(nave,tipo) end if event.phase == "ended" or event.phase == "canceled" then display.getCurrentStage():setFocus(event.target, nil ) end end
+--local disparar = function() return fireLaser(nave,tipo) end
 botao:addEventListener("touch", disparar )
 
 -- COLISAO -----------------------------------------------------------------------
@@ -486,11 +496,69 @@ local function colisaoHeroiLaser(obj1, obj2)
     end
 end
 
---[[local function proximaFase()
+-------------------------------------------------------------------------------------
+local function disparoChefe( chefe )
+    if( vidas ~= 0 and vidaChefe ~= 0 )then
+        local newLaser = display.newImageRect( mainGroup, inimigoSheet, 7, 60, 120 )
+        physics.addBody( newLaser, "dynamic", { radius = 10, isSensor=true } )
+        newLaser.isBullet = true
+        newLaser.myName = "inimigolaser"
+        newLaser.x = chefe.x
+        newLaser.y = chefe.y+5
+        newLaser:toBack()
+        newLaser.xScale = 0.6
+        newLaser.yScale = 0.6
+        --newLaser:setLinearVelocity( math.random(-100,100), 350 )
+        transition.to(newLaser, { y = 490, time = 1000, onComplete = function() display.remove(newLaser) end } )
+    end
+end
+
+local function ataqueChefe( chefe )
+    audio.play(musicaChefe);
+    local movimento2 = transition.to(chefe, { x = 260, time = 4000, transition=easing.continuousLoop, onComplete = function() ataqueChefe(chefe) end } )
+    --timer.performWithDelay(5000, movimento2, 0 )
+    local tiro = function() return disparoChefe(chefe) end
+    atkChefeLoopTimer=timer.performWithDelay(800, tiro, 0)
+end
+
+-- Funcao para carregar o chefao
+local function bigBoss( event )
+    onClose();
+    chefe = display.newImageRect(mainGroup, inimigoSheet, 4, 100, 120)
+    chefe.x = display.contentCenterX -100
+    chefe.y = 50
+    physics.addBody( chefe, {radius = 30, isSensor = true } )
+    chefe.myName = "chefe"
+    --chefe.xScale = 0.7
+    --chefe.yScale = 0.7
+    chefe.alpha = 0
+    --local ataque = function() ataqueChefe(chefe) end
+    transition.to(chefe, {alpha = 1, time = 3000, onComplete = function() ataqueChefe(chefe) end } ) 
+end
+
+local function chefeFinal( event )
+
+    timer.cancel( inimigoLoopTimer );
+    --timer.performWithDelay(200,checkaTabela,0);
+    timer.performWithDelay(6000, bigBoss, 1)
+end
+
+local function move()
+
+	transition.to(fundo, { y = 800, time = 45000, onComplete = function() chefeFinal() end })
+
+end
+
+local function updateFrame()
+    move()
+end
+
+local function proximaFase()
 
     display.remove(botao)
-    local parametros = { tipoNave = tipo , totalVidas = vidas, totalScore = score, totalMunicao = municao }
-    transition.to( nave, { y = -50, time = 3000, transition=easing.inQuad, onComplete = function() gotoFase2(parametros) end } )
+    --local parametros = { tipoNave = tipo , totalVidas = vidas, totalScore = score, totalMunicao = municao }
+    transition.to( nave, { y = -50, time = 3000, transition=easing.inQuad, onComplete = function() fimDeJogo() end } )--gotoFase2(parametros) end } )
+
 
 end
 
@@ -499,7 +567,16 @@ local function posicaoVitoria(spaceship)
     transition.moveTo(spaceship, { x = display.contentCenterX, y = display.contentHeight - 50, time = 2000, onComplete = function() proximaFase() end } )
 
 end
-]]--
+
+local function checkaTabela()
+
+    if (inimigoTable[1] == nil ) then
+        timer.performWithDelay(2000, bigBoss, 1)
+    else
+        print(inimigoTable[1])
+    end
+end
+
 -- Colisao Geral ---------------------------------
 local function onCollision( event )
     local pontos
@@ -512,19 +589,22 @@ local function onCollision( event )
             -- Remove both the laser and asteroid
             display.remove( obj1 )
             display.remove( obj2 )
-            for i = #inimigoTable, 1, -1 do
-                if ( inimigoTable[i] == obj1 or inimigoTable[i] == obj2 ) then
-                    table.remove( inimigoTable, i)
-                    break
-                end
+            if(obj1.myName == "inimigo" ) then
+                removeInimigo(obj1)
+            else
+                removeInimigo(obj2)
             end
             --[[ Increase score]]--
             score = score + 100;
             scoreText.text = "Score: " .. score
-        --[[elseif (obj1.myName == "laser" and obj2.myName == "chefe") then
+        elseif (obj1.myName == "laser" and obj2.myName == "chefe") then
                 display.remove(obj1);
                 vidaChefe = vidaChefe - 1
                 if(vidaChefe == 0 )then
+                    timer.cancel(atkChefeLoopTimer)
+                    onClose();
+                    audio.play(morteChefe, { loop = 1, channel = 3 } )
+                    --transition.to(chefe, {alpha = 0, time = 900, onComplete = function() display.remove( chefe ) end } )
                     display.remove(chefe)
                     posicaoVitoria(nave);
                 end
@@ -532,12 +612,16 @@ local function onCollision( event )
                 display.remove(obj2);
                 vidaChefe = vidaChefe - 1
                 if(vidaChefe == 0 )then
-                    display.remove( chefe )
-                    --display.remove( botao )
+                    timer.cancel(atkChefeLoopTimer)
+                    onClose();
+                    audio.play(morteChefe, { loop = 1, channel = 3 } )
+                    --transition.to(chefe, {alpha = 0, time = 900, onComplete = function() display.remove( chefe ) end } )
+                    display.remove(chefe)
+                    display.remove( botao )
                     --display.remove( nave )
                     posicaoVitoria(nave);                
                     --timer.performWithDelay( 1000, fimDeJogo )
-                end]]--
+                end
         elseif ( ( obj1.myName == "nave" and obj2.myName == "inimigo" ) or
                 ( obj1.myName == "inimigo" and obj2.myName == "nave" )) then 
                 colisaoHeroiAlien(obj1,obj2);
