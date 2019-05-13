@@ -1,7 +1,7 @@
 
 local imagens = require("src.carregarImagens")
-local disparo = require("disparo")
-local uiDisp = require("src.uiDisplay")
+local disparo = require("src.disparo.disparo")
+local uiDisp = require("src.display.uiDisplay")
 
 Heroi = {tipo = nil, imagem = nil, municao = 0 , vidas = 3, died = false }
 
@@ -39,6 +39,7 @@ function Heroi:Recarregar()
 
     if(self.tipo ~= 2) then
         self.municao = 10;
+        uiDisp.Recarregou();
     end
 end
 

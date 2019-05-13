@@ -1,5 +1,5 @@
 local imagens = require("src.carregarImagens")
-local disparo = require("disparo")
+local disparo = require("src.disparo.disparo")
 
 --Inimigo = {tipo = nil, imagem = nil, nome = nil, vidas = nil }
 Inimigo = {}

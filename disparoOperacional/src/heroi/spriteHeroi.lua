@@ -69,4 +69,28 @@ function spriteHeroi.carregarVida(grupo,tipo)
 end
 
 
+local reloadOptions =
+{
+    width = 155,
+    height = 220,
+    numFrames = 3
+}
+
+local reloadSheet = graphics.newImageSheet( "images/herois/recarregar.png", reloadOptions )
+
+local reloadSequencia = {
+    {
+        name = "reload",
+        start = 1,
+        count = 3,
+        time = 600,
+        loopCount = 0,
+        loopDirection = "forward"
+    }
+}
+
+function spriteHeroi.recarregar(grupo)
+    return display.newSprite( grupo, reloadSheet, reloadSequencia)
+end
+
 return spriteHeroi

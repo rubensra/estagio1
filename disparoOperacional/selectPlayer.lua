@@ -6,23 +6,26 @@ local scene = composer.newScene()
 
 -- MODULOS ---------------------------------------------------------------------------
 local som = require("src.audio.sons")
-local herois = require("src.heroi.spriteHeroi")
 local imagens = require("src.carregarImagens")
+local transicao = require("src.fases.fases")
 --------------------------------------------------------------------------------------
 
 local function irSelecao1()
 	local nave = { tipoNave = 2, totalVidas = 3, totalScore = 0, totalMunicao = 99 }
-	composer.gotoScene( "fase1", { time=800, effect="crossFade", params=nave } )
+	--composer.gotoScene( "fase1", { time=800, effect="crossFade", params=nave } )
+	transicao.gotoFase1(nave)
 end
 
 local function irSelecao2()
 	local nave = { tipoNave = 3, totalVidas = 3, totalScore = 0, totalMunicao = 10, fim = false }
-	composer.gotoScene(  "fase3", { time=800, effect="crossFade", params=nave } )
+	--composer.gotoScene(  "fase3", { time=800, effect="crossFade", params=nave } )
+	transicao.gotoFase3(nave)
 end
 
 local function irSelecao3()
-	local nave = { tipoNave = 1, totalVidas = 3, totalScore = 0, totalMunicao = 10, fim = false }--{nome="pinguim"}
-	composer.gotoScene(  "fase2", { time=800, effect="crossFade", params=nave } )
+	local nave = { tipoNave = 1, totalVidas = 3, totalScore = 0, totalMunicao = 10, fim = false }
+	--composer.gotoScene(  "fase2", { time=800, effect="crossFade", params=nave } )
+	transicao.gotoFase2(nave)
 end
 
 -- -----------------------------------------------------------------------------------
@@ -46,9 +49,9 @@ fundo.x = display.contentCenterX;
 fundo.y = display.contentCenterY;
 local pinguim = imagens.carregarHeroi(mainGroup,1)--herois.carregarHeroi(mainGroup,1)--display.newImageRect( mainGroup, naveSheet, 1, 70, 80 );
 pinguim.myName = "pinguim";
-local maca = herois.carregarHeroi( mainGroup,3);
+local maca = imagens.carregarHeroi( mainGroup,3);
 maca.myName = "maca";
-local janela = herois.carregarHeroi(mainGroup,2);
+local janela = imagens.carregarHeroi(mainGroup,2);
 janela.myName = "Janela";
 
 maca.x = display.contentWidth / 4;
