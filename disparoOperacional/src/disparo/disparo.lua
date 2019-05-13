@@ -120,7 +120,8 @@ function disparo.Chefe3(inimigo,tipo, grupo, vidas, vidaChefe)
         newLaser:toBack()
         newLaser.xScale = 0.3
         newLaser.yScale = 0.3
-        transition.to(newLaser, { y = 490, time = 1500, onComplete = function() display.remove(newLaser) end } )
+        --transition.to(newLaser, { y = 490, time = 1500, onComplete = function() display.remove(newLaser) end } )
+        transition.moveTo(newLaser, {x = nave.x, y = nave.y + 100, time = 3000, onComplete = function() display.remove(newLaser) end } )
     end
 end
 

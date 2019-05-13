@@ -5,9 +5,9 @@ local transicao = {}
 function transicao.fimDeJogo( vidaChefe)
 
     if( vidaChefe == 0 )then
-        composer.gotoScene( "vitoria", { time=800, effect="crossFade"} )
+        composer.gotoScene( "src.fases.vitoria", { time=800, effect="crossFade"} )
     else
-        composer.gotoScene( "fimJogo", { time=800, effect="crossFade"} )
+        composer.gotoScene( "src.fases.fimJogo", { time=800, effect="crossFade"} )
     end
 end
 
