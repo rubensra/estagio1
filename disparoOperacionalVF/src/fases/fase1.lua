@@ -229,7 +229,7 @@ local function geraItens()
 
     local powerup = math.random(2)
 
-    if(powerup == 1 and nave:getEscudo() == false) then
+    if(powerup == 1 and nave:getEscudo() == false and nave:getTipo() > 1) then
         local parametrosItem = { grupo = mainGroup, tipo = 1}
         item.antiVirus(parametrosItem);
     elseif(powerup == 2 and nave:getEspecial() == false)then
@@ -359,6 +359,7 @@ end
 
 -- Funcao para carregar o chefao ---------------------------------------------------
 local function bigBoss( event )
+    som.temaChefe1();
     chefe = enemy.new(1,mainGroup,1)
     chefe.x = display.contentCenterX
     chefe.y = -100
@@ -372,6 +373,7 @@ local function bigBoss( event )
 end
 
 local function chefeFinal( event )
+    som.onClose()
     timer.cancel( inimigoLoopTimer );
     timer.cancel( itemLoopTimer );
     timer.performWithDelay(6000, bigBoss, 1)

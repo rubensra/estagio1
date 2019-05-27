@@ -222,7 +222,7 @@ local function geraItens()
 
     local powerup = math.random(2)
 
-    if(powerup == 1 and nave:getEscudo() == false) then
+    if(powerup == 1 and nave:getEscudo() == false and nave:getTipo() > 1) then
         local parametrosItem = { grupo = mainGroup, tipo = 1}
         item.antiVirus(parametrosItem);
     elseif(powerup == 2 and nave:getEspecial() == false)then
@@ -321,6 +321,7 @@ local function colisaoInimigo(self,event)
             end      
             if(lifeChefe == 0 )then
                 nave.imagem:removeEventListener("collision")
+                timer.cancel(atkChefeLoopTimer)
                 score = score + 200
                 score = uiDisp.AtualizaScore(score)
                 display.remove(obj2);
@@ -354,6 +355,7 @@ local function ataqueChefe()
     --som.temaChefe();
     transition.to(chefe, { x = math.random(50, 260), y = display.contentCenterY, time = 2000, transition=easing.continuousLoop, onComplete = function() ataqueChefe() end } )
     if(shot == false) then
+        som.temaChefe3()
         local parametros = { fase = 3, grupo = mainGroup, vidas = nave:getVidas(), tipo = 1, vidaChefe = lifeChefe, nave = nave.imagem }
         local tiro = function() return enemy.Disparar(chefe,parametros) end
         atkChefeLoopTimer = timer.performWithDelay(1000, tiro, 0)    
@@ -364,6 +366,7 @@ end
 
 -- Funcao para carregar o chefao ---------------------------------------------------
 local function bigBoss( event )
+--    som.temaChefe3()
     chefe = enemy.new(3,mainGroup,1)
     chefe.x = display.contentCenterX
     chefe.y = 50
@@ -375,7 +378,7 @@ local function bigBoss( event )
 end
 
 local function chefeFinal( event )
-    
+    som.onClose();
     timer.cancel( inimigoLoopTimer );
     timer.cancel( itemLoopTimer );
     timer.performWithDelay(3000, bigBoss, 1)

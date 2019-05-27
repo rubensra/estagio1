@@ -78,19 +78,6 @@ function ui.Botao(parametros)
 
 end
 
---[[function ui.removeBotao(parametros)
-
-
-    parametros.botaoLivre:removeSelf();
-    parametros.botaoLivre = nil;
-    parametros.botaoPressionado:removeSelf();
-    parametros.botaoPressionado = nil;
-    parametros.botaoEspecialLivre:removeSelf();
-    parametros.botaoEspecialLivre = nil;
-    parametros.botaoEspecialPressionado:removeSelf();
-    parametros.botaoEspecialPressionado = nil;
-end]]
-
 function ui.botaoPressiona(parametros)
 
     parametros.botaoLivre.isVisible = false

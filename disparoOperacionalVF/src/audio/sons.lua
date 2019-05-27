@@ -19,8 +19,18 @@ function sons.GameOver()
 end
 
 
-function sons.temaChefe()
-    local somChefe = audio.loadSound("audio/musicaChefe.wav")
+function sons.temaChefe1()
+    local somChefe = audio.loadSound("audio/chefes/Chefe_fase1.wav")
+    audio.play(somChefe, { channel = 3 })
+end
+
+function sons.temaChefe2()
+    local somChefe = audio.loadSound("audio/chefes/Chefe_fase2.wav")
+    audio.play(somChefe, { channel = 3 })
+end
+
+function sons.temaChefe3()
+    local somChefe = audio.loadSound("audio/chefes/Chefe_fase3.wav")
     audio.play(somChefe, { channel = 3 })
 end
 

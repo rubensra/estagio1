@@ -17,7 +17,7 @@ local function irSelecao1()
 end
 
 local function irSelecao2()
-	local nave = { tipoNave = 3, totalVidas = 2, totalScore = 0, totalMunicao = 10, fim = false }
+	local nave = { tipoNave = 3, totalVidas = 3, totalScore = 0, totalMunicao = 10, fim = false }
 	--composer.gotoScene(  "fase3", { time=800, effect="crossFade", params=nave } )
 	transicao.gotoFase1(nave)
 end

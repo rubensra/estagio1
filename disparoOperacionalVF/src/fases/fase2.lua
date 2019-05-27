@@ -221,7 +221,7 @@ local function geraItens()
 
     local powerup = math.random(2)
 
-    if(powerup == 1 and nave:getEscudo() == false) then
+    if(powerup == 1 and nave:getEscudo() == false and nave:getTipo() > 1) then
         local parametrosItem = { grupo = mainGroup, tipo = 1}
         item.antiVirus(parametrosItem);
     elseif(powerup == 2 and nave:getEspecial() == false)then
@@ -337,7 +337,7 @@ end
 -------------------------------------------------------------------------------------
 
 local function ataqueChefe(chefe)
-    som.temaChefe();
+    som.temaChefe2();
     local movimento2 = transition.to(chefe, { x = 260, time = 3000, iterations = 0, transition=easing.continuousLoop})--onComplete = function() ataqueChefe(chefe) end } )
     local parametros = { fase = 2, grupo = mainGroup, vidas = nave:getVidas(), tipo = 4, vidaChefe = lifeChefe }
     local tiro = function() return enemy.Disparar(chefe,parametros) end
@@ -442,7 +442,7 @@ function scene:show( event )
         physics.start()
 		transition.to(nave.imagem, {x = display.contentCenterX, y = display.contentCenterY, time = 3000, transition=easing.inOutBack } )
 		updateFrame()
-        inimigoLoopTimer = timer.performWithDelay(2500, geraInimigo, 0)
+        inimigoLoopTimer = timer.performWithDelay(3000, geraInimigo, 0)
         Runtime:addEventListener( "accelerometer", recarregar );
         itemLoopTimer = timer.performWithDelay(7000, geraItens, 0)
         som.somFase2();
